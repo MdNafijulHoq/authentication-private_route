@@ -13,6 +13,9 @@ import Order from './components/Order/Order';
 import AuthContextProvider from './ContextProvider/AuthContextProvider';
 import PrivateRoute from './PrivateRoute/PrivateRoute';
 import Contact from './components/Contact/Contact';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const router = createBrowserRouter([
   {
@@ -48,5 +51,7 @@ createRoot(document.getElementById('root')).render(
     <AuthContextProvider>
     <RouterProvider router={router} />
     </AuthContextProvider>
+    <ToastContainer></ToastContainer>
+    
   </StrictMode>,
 )

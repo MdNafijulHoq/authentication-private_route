@@ -27,6 +27,7 @@ const Login = () => {
       .catch((error) => {
         console.log(error)
       });
+      
   };
 
   // For Google login Handle
@@ -96,7 +97,7 @@ const Login = () => {
                 required
               />
               <span
-                className="absolute top-[217px] left-[300px] font-semibold text-xs"
+                className="absolute top-[217px] left-[280px] font-semibold text-xs"
                 onClick={() => setShowLogInPass(!showLogInPass)}
               >
                 {showLogInPass ? "Hide" : "Show"}
@@ -111,14 +112,13 @@ const Login = () => {
             <div className="form-control mt-6">
               <button className="btn btn-primary">Login</button>
             </div>
-            <p className="p-3">
+            <p className="text-center font-semibold">
               New in the Website? Please{" "}
               <Link to="/registration" className="btn btn-link">
                 Register!
               </Link>
             </p>
-          </form>
-          <div className="flex justify-center gap-2">
+            <div className="flex justify-center gap-2">
             <p>
               <button
                 onClick={handleGoogleLogIn}
@@ -144,6 +144,8 @@ const Login = () => {
               </button>
             </p>
           </div>
+          </form>
+          
         </div>
       </div>
     </div>
