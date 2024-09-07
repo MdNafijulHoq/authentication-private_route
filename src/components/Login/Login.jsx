@@ -1,11 +1,24 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../ContextProvider/AuthContextProvider";
+import { toast } from 'react-toastify';
+import { Bounce } from 'react-toastify';
+import { sendPasswordResetEmail } from "firebase/auth";
+import auth from "../../Firebase/firebase.config";
 
 const Login = () => {
   const [showLogInPass, setShowLogInPass] = useState(false);
 
-  const { signInUser, signInWithGoogle, signInWithFacebook, signInWithGithub } =
+  // This state only for handle firebase user error like already exist
+  const [logInError, setLogInError] = useState('')
+
+  // This state only for handle firebase user created successfully
+  const [logInSuccess, setLogInSuccess] = useState('')
+
+  // For emailRef (forgot password)
+  const emailRef = useRef(null)
+
+  const { signInUser, signInWithGoogle, signInWithFacebook, signInWithGithub, logOut } =
     useContext(AuthContext);
 
   // Navigate here for after logging which page we want to see
@@ -17,18 +30,123 @@ const Login = () => {
     const password = e.target.password.value;
     console.log(email, password);
 
+    
+
     // Login user in firebase
     signInUser(email, password)
       .then((result) => {
-        console.log(result)
+        console.log(result.user)
         e.target.reset(); // For reset login Input field
         navigate("/"); // After login we want to see home page
+
+        // check login successfull & also email verfied or not
+        if(result.user.emailVerified){
+          setLogInSuccess(
+            toast.success('🦄 User Login Successfully', {
+              position: "top-center",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              transition: Bounce,
+              })
+          )
+        }
+        else{
+          toast.error('🦄 Please verified your Gmail First!', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+            });
+            logOut();
+            navigate('/login')
+            
+            
+        }
+
+        
       })
       .catch((error) => {
         console.log(error)
+        setLogInError(
+          toast.error('Unregister User. Please register first!', {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+            })
+        )
       });
       
   };
+
+  // For forgotten password
+  const handleForgotPassword = () => {
+    const email = emailRef.current.value
+   if(!email){
+    toast.warn('Please provide an email!', {
+      position: "top-right",
+      autoClose: 6000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+      });
+      return
+   }
+   else if(!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)){
+    toast.error('Please provide a valid Email', {
+      position: "top-center",
+      autoClose: 6000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+      });
+      return
+   }
+
+  //  send email verfication for forgot password
+  sendPasswordResetEmail(auth, email)
+  .then(() => {
+    toast.info('Please check your Gmail', {
+      position: "top-right",
+      autoClose: 6000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+      });
+  })
+  .catch(() => {
+
+  })
+  }
+    
+
 
   // For Google login Handle
   const handleGoogleLogIn = () => {
@@ -79,6 +197,7 @@ const Login = () => {
               <input
                 type="email"
                 name="email"
+                ref={emailRef} // for email(forgot password)
                 placeholder="email"
                 className="input input-bordered"
                 required
@@ -104,7 +223,7 @@ const Login = () => {
               </span>
 
               <label className="label">
-                <a href="#" className="label-text-alt link link-hover">
+                <a onClick={handleForgotPassword} href="#" className="label-text-alt link link-hover underline">
                   Forgot password?
                 </a>
               </label>
@@ -144,6 +263,18 @@ const Login = () => {
               </button>
             </p>
           </div>
+          {
+            logInError && <p>
+              {logInError}
+              {setLogInError('')}
+              </p>
+            
+          }
+          {
+            logInSuccess && <p>
+              {logInSuccess}
+            </p>
+          }
           </form>
           
         </div>

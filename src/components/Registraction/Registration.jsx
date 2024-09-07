@@ -2,13 +2,15 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../ContextProvider/AuthContextProvider";
 import { toast } from 'react-toastify';
-import { Bounce } from 'react-toastify';
+import { Bounce, Zoom } from 'react-toastify';
+import { sendEmailVerification, updateProfile } from "firebase/auth";
+
 
 
 
 const Registration = () => {
 
-  const { createUser} = useContext(AuthContext);
+  const { createUser, logOut} = useContext(AuthContext);
 
   const [showPass, setShowPass] = useState('false');
 
@@ -79,7 +81,40 @@ const Registration = () => {
           transition: Bounce,
           })
       )
+
+      // after registration we will do user email verification
+      sendEmailVerification( result.user)
+      .then(() => {
+        toast.warn('🦄 Please check you email & verified', {
+          position: "top-center",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Zoom,
+          });
+      })
+      .catch(() => {
+      })
+
+      // update user profile/Name
+      updateProfile(result.user, {
+        displayName: name,
+      })
+      .then(() => {
+
+      })
+      .catch(() => {
+
+      })
+      
+      logOut();
     })
+
+
     .catch((error) => {
       console.log(error) 
       setRegisterEror(                          //for show the firebase error
