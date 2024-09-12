@@ -5,7 +5,7 @@ import { useContext } from "react";
 
 const Header = () => {
 
-  const { user, logOut } = useContext(AuthContext)
+  const { user, logOut} = useContext(AuthContext)
   
   // For handle LogOut
   const handleLogOut = () => {
@@ -80,7 +80,9 @@ const Header = () => {
     {
       user ? 
       <>
-      <span className="p-3 underline font-semibold">{user.email}</span>
+      <span className="p-3 underline font-semibold">
+            {user.displayName}
+      </span>
       <a onClick={handleLogOut} className="btn">Log Out</a>
       </>
       : 
